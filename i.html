@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Calculadora de Distância</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .container {
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    select, button {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    button {
+        background-color: #2575fc;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    button:hover {
+        background-color: #6a11cb;
+    }
+
+    #resultado {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    #mapa {
+        margin-top: 20px;
+        border-radius: 10px;
+        max-width: 100%;
+        height: auto;
+        border: 2px solid #ccc;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Calculadora de Distância</h1>
+
+    <select id="origem">
+        <option value="">Cidade de origem</option>
+        <option value="São Paulo">São Paulo</option>
+        <option value="Rio de Janeiro">Rio de Janeiro</option>
+        <option value="Belo Horizonte">Belo Horizonte</option>
+        <option value="Curitiba">Curitiba</option>
+        <option value="Porto Alegre">Porto Alegre</option>
+    </select>
+
+    <select id="destino">
+        <option value="">Cidade de destino</option>
+        <option value="São Paulo">São Paulo</option>
+        <option value="Rio de Janeiro">Rio de Janeiro</option>
+        <option value="Belo Horizonte">Belo Horizonte</option>
+        <option value="Curitiba">Curitiba</option>
+        <option value="Porto Alegre">Porto Alegre</option>
+    </select>
+
+    <button onclick="calcularDistancia()">Calcular</button>
+
+    <div id="resultado"></div>
+
+    <!-- Mapa local -->
+    <img id="mapa" src="brasil.png" alt="Mapa do Brasil">
+</div>
+
+<script>
+const distancias = {
+    "São Paulo": { "Rio de Janeiro": 429, "Belo Horizonte": 586, "Curitiba": 408, "Porto Alegre": 1132 },
+    "Rio de Janeiro": { "São Paulo": 429, "Belo Horizonte": 434, "Curitiba": 710, "Porto Alegre": 1154 },
+    "Belo Horizonte": { "São Paulo": 586, "Rio de Janeiro": 434, "Curitiba": 852, "Porto Alegre": 1027 },
+    "Curitiba": { "São Paulo": 408, "Rio de Janeiro": 710, "Belo Horizonte": 852, "Porto Alegre": 710 },
+    "Porto Alegre": { "São Paulo": 1132, "Rio de Janeiro": 1154, "Belo Horizonte": 1027, "Curitiba": 710 }
+};
+
+const velocidadeMedia = 80; // km/h
+
+function calcularDistancia() {
+    const origem = document.getElementById("origem").value;
+    const destino = document.getElementById("destino").value;
+
+    if (!origem || !destino) {
+        alert("Selecione ambas as cidades.");
+        return;
+    }
+
+    if (origem === destino) {
+        document.getElementById("resultado").innerHTML = "Você selecionou a mesma cidade.";
+        return;
+    }
+
+    const distancia = distancias[origem][destino];
+    const tempoHoras = distancia / velocidadeMedia;
+    const horas = Math.floor(tempoHoras);
+    const minutos = Math.round((tempoHoras - horas) * 60);
+
+    document.getElementById("resultado").innerHTML =
+        `Distância: ${distancia} km<br>Tempo estimado: ${horas}h ${minutos}min`;
+}
+</script>
+</body>
+</html>
