@@ -1,23 +1,124 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
-    <title>Whac-A-Mole</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medidor de Distância</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #5ae6ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 350px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #resultado {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .assinatura {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: rgba(0, 0, 0, 0.3);
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+    </style>
 </head>
 <body>
-    <section>
-        <div class="banner">
-            <img src="images/Whac-A-Mole.jpg" alt="Imagem do jogo físico">
-        </div>
-    </section>
-    <footer>
-        <div class="nextPage">
-            <a href="regras.html" class="circulo">
-                <img src="images/arrow-down.png" alt="seta para baixo" class="arrow">
-            </a>
-        </div>
-    </footer>
+    <h2>Medidor de Distância entre Cidades</h2>
+    <div class="card">
+        <label>Origem:</label>
+        <input type="text" id="origem" placeholder="Digite a cidade de origem" />
+
+        <label>Destino:</label>
+        <input type="text" id="destino" placeholder="Digite a cidade de destino" />
+
+        <button onclick="calcularDistancia()">Calcular Distância</button>
+
+        <div id="resultado"></div>
+    </div>
+    <div class="assinatura">Created by Talles rodrigues</div>
+    
+    <script>
+        async function calcularDistancia() {
+            const origem = document.getElementById('origem').value;
+            const destino = document.getElementById('destino').value;
+            const resultado = document.getElementById('resultado');
+
+            if (!origem || !destino) {
+                resultado.innerHTML = "Preencha os dois campos!";
+                return;
+            }
+
+            try {
+                // Geocodificar origem e destino usando Nominatim (gratuito)
+                const geocode = async (cidade) => {
+                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cidade)}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    if (!data[0]) return null;
+                    return { lat: data[0].lat, lon: data[0].lon };
+                };
+
+                const p1 = await geocode(origem);
+                const p2 = await geocode(destino);
+
+                if (!p1 || !p2) {
+                    resultado.innerHTML = "Não foi possível localizar uma das cidades.";
+                    return;
+                }
+
+                // Consultar distância via OSRM (rota real, sem API key)
+                const url = `https://router.project-osrm.org/route/v1/driving/${p1.lon},${p1.lat};${p2.lon},${p2.lat}?overview=false`;
+
+                const rota = await fetch(url);
+                const dados = await rota.json();
+
+                if (dados.routes && dados.routes[0]) {
+                    const km = dados.routes[0].distance / 1000;
+                    resultado.innerHTML = `Distância: ${km.toFixed(2)} km`;
+                } else {
+                    resultado.innerHTML = "Não foi possível calcular a distância.";
+                }
+
+            } catch (error) {
+                resultado.innerHTML = "Erro ao consultar o serviço de rotas.";
+            }
+        }
+    </script>
 </body>
 </html>
